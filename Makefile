@@ -69,20 +69,20 @@ tests/bloaty_test: tests/bloaty_test.cc $(TESTLIBS)
 tests/bloaty_misc_test: tests/bloaty_misc_test.cc $(TESTLIBS)
 	$(CXX) $(CXXFLAGS) $(TESTFLAGS) -o $@ $^ -lpthread
 
-third_party/googletest/googlemock/gtest/libgtest_main.a: third_party/googletest/CMakeLists.txt
+third%party/googletest/googlemock/gtest/libgtest_main.a third%party/googletest/googlemock/gtest/libgtest.a: third_party/googletest/CMakeLists.txt
 	cd third_party/googletest && cmake . && $(MAKE)
 
 ## Fuzzing #####################################################################
 
 FUZZFLAGS=-fsanitize=address -fsanitize-coverage=trace-pc-guard
-TESTCMD=-fsanitize-coverage=trace-pc-guard -c -x c++ /dev/null -o /dev/null 2> /dev/null
+TESTCMD=-fsanitize-coverage=trace-pc-guard -Werror -c -x c++ /dev/null -o /dev/null 2> /dev/null
 TESTRESULT=$(shell $(CXX) $(TESTCMD) && echo ok)
 ifeq ($(TESTRESULT), ok)
 fuzz: tests/fuzz_target
 else
 fuzz:
-	echo "Fuzzing requires that CXX is a very recent Clang (ie from svn"
-	false
+	@echo "Fuzzing requires that CXX is a very recent Clang (ie. from svn)"
+	@false
 endif
 
 LIBFUZZER=third_party/libFuzzer/libFuzzer.a
